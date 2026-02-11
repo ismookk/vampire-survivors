@@ -151,17 +151,17 @@ const camera = {
 
 // ================= PLAYER =================
 const playerImage = new Image();
-playerImage.src = "player.png";
+playerImage.src = "image/player.png";
 const bossImage = new Image();
-bossImage.src = "boss.png";
+bossImage.src = "image/boss.png";
 const chaserImage = new Image();
-chaserImage.src = "chaser.png";
+chaserImage.src = "image/chaser.png";
 const dasherImage = new Image();
-dasherImage.src = "dasher.png";
+dasherImage.src = "image/dasher.png";
 const tankImage = new Image();
-tankImage.src = "tank.png";
+tankImage.src = "image/tank.png";
 const shooterImage = new Image();
-shooterImage.src = "shooter.png";
+shooterImage.src = "image/shooter.png";
 const player = {
   x: WORLD_WIDTH / 2,
   y: WORLD_HEIGHT / 2,
