@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>뱀파이어 서바이버 라이크</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="gameContainer">
+    <canvas id="game" width="800" height="600"></canvas>
+    
+    <div id="ui">
+      <div id="topInfo">
+        <div id="timerText">5:00</div>
+        <div id="phaseText">Phase 1: 시작</div>
+      </div>
+
+      <div class="bar-container">
+        <div class="bar">
+          <div id="hpFill" class="bar-fill" style="width: 100%;"></div>
+          <span class="bar-label">HP</span>
+        </div>
+      </div>
+
+      <div class="bar-container">
+        <div class="bar">
+          <div id="expFill" class="bar-fill" style="width: 0%;"></div>
+          <span class="bar-label">EXP</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="levelText">Lv. 1</div>
+
+    <!-- 레벨업 모달 -->
+    <div id="levelUpModal" class="modal hidden">
+      <h2>⭐ LEVEL UP! ⭐</h2>
+      <div class="choices">
+        <button>업그레이드 1</button>
+        <button>업그레이드 2</button>
+        <button>업그레이드 3</button>
+      </div>
+    </div>
+
+    <!-- 게임 오버 모달 -->
+    <div id="gameOverModal" class="modal hidden">
+      <div id="finalStats">
+        <h2>게임 종료</h2>
+        <p>생존 시간: 0:00</p>
+        <p>레벨: 1</p>
+        <p>처치한 적: 0마리</p>
+      </div>
+      <button id="restartBtn">다시 시작</button>
+    </div>
+    <button id="pauseBtn">⏸ 일시정지</button>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

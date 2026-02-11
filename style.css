@@ -1,0 +1,233 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  color: white;
+  overflow: hidden;
+}
+
+#gameContainer {
+  position: relative;
+}
+
+canvas {
+  border: 2px solid #444;
+  display: block;
+}
+
+/* UI 오버레이 */
+#ui {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  pointer-events: none;
+}
+
+/* 타이머 & 페이즈 */
+#topInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+#timerText, #phaseText {
+  background: rgba(0,0,0,0.7);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#timerText {
+  color: #ffcc00;
+}
+
+#phaseText {
+  color: #ff6b6b;
+}
+
+#pauseBtn {
+  background: rgba(0,0,0,0.7);
+  border: 2px solid #666;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.3s;
+}
+
+#pauseBtn:hover {
+  background: rgba(50,50,50,0.9);
+  border-color: #ffd700;
+  transform: scale(1.05);
+}
+
+/* 체력바 */
+.bar-container {
+  background: rgba(0,0,0,0.7);
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 6px;
+}
+
+.bar {
+  height: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #333;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  transition: width 0.2s;
+}
+
+#hpFill {
+  background: linear-gradient(90deg, #ff4444, #ff6b6b);
+}
+
+#expFill {
+  background: linear-gradient(90deg, #4da6ff, #66b3ff);
+}
+
+.bar-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+
+#levelText {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* 레벨업 모달 */
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(20, 20, 20, 0.95);
+  border: 3px solid #ffd700;
+  border-radius: 20px;
+  padding: 30px;
+  pointer-events: auto;
+  min-width: 400px;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+}
+
+.modal h2 {
+  text-align: center;
+  color: #ffd700;
+  margin-bottom: 20px;
+  font-size: 28px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.choices button {
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border: 2px solid #555;
+  color: white;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.choices button:hover {
+  background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+  border-color: #ffd700;
+  transform: translateX(5px);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+/* 게임 오버 모달 */
+#gameOverModal {
+  min-width: 500px;
+  text-align: center;
+}
+
+#gameOverModal h2 {
+  font-size: 48px;
+  margin-bottom: 30px;
+}
+
+#finalStats {
+  background: rgba(0,0,0,0.5);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+#finalStats p {
+  font-size: 20px;
+  margin: 10px 0;
+}
+
+#restartBtn {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border: none;
+  color: white;
+  padding: 15px 40px;
+  font-size: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+#restartBtn:hover {
+  background: linear-gradient(135deg, #5CBF60, #55b059);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* 반응형 */
+@media (max-width: 900px) {
+  canvas {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+}
