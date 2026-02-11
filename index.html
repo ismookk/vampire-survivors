@@ -7,7 +7,41 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="gameContainer">
+  <!-- 로비 화면 -->
+  <div id="lobby">
+    <h1>🎮 뱀파이어 서바이버</h1>
+    <div class="character-selection">
+      <h2>캐릭터 선택</h2>
+      <div class="characters">
+        <div class="character-card selected" data-character="warrior">
+          <div class="character-preview">⚔️</div>
+          <h3>전사</h3>
+          <p>공격력 +20%</p>
+          <p>체력 +20</p>
+        </div>
+        <div class="character-card" data-character="mage">
+          <div class="character-preview">🔮</div>
+          <h3>마법사</h3>
+          <p>공격 속도 +30%</p>
+          <p>관통력 +1</p>
+        </div>
+        <div class="character-card" data-character="ranger">
+          <div class="character-preview">🏹</div>
+          <h3>레인저</h3>
+          <p>이동 속도 +25%</p>
+          <p>탄환 수 +1</p>
+        </div>
+      </div>
+    </div>
+    <button id="startBtn" class="start-button">게임 시작</button>
+    <div class="controls-info">
+      <p>🖱️ 마우스로 이동</p>
+      <p>⚡ 자동 공격</p>
+    </div>
+  </div>
+
+  <!-- 게임 화면 -->
+  <div id="gameContainer" class="hidden">
     <canvas id="game" width="800" height="600"></canvas>
     
     <div id="ui">
@@ -54,6 +88,7 @@
       <button id="restartBtn">다시 시작</button>
     </div>
     <button id="pauseBtn">⏸ 일시정지</button>
+    <button id="muteBtn">🔇 음소거</button>
   </div>
 
   <script src="game.js"></script>
