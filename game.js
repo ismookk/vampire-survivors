@@ -123,6 +123,16 @@ function playSound(type) {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.8);
       break;
+      
+    case 'bomb':
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(80, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + 0.3);
+      gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.4);
+      break;
   }
 }
 
@@ -162,6 +172,8 @@ const tankImage = new Image();
 tankImage.src = "image/tank.png";
 const shooterImage = new Image();
 shooterImage.src = "image/shooter.png";
+const arrowImage = new Image();
+arrowImage.src = "image/arrow.png";
 const player = {
   x: WORLD_WIDTH / 2,
   y: WORLD_HEIGHT / 2,
@@ -180,7 +192,7 @@ const player = {
   piercing: 0,
   isHitInvincible: false,
   isItemInvincible: false,
-  invincibilityDuration: 1.0,
+  invincibilityDuration: 0.5,
   invincibleTimer: 0,
   itemInvincibleTimer: 0,
   frameX: 0,
@@ -265,7 +277,7 @@ const ENEMY_TYPES = {
     expValue: 20
   },
   dasher: {
-    hp: 2,
+    hp: 2.5,
     speed: 2.5,
     r: 10,
     dashCooldown: 120,
@@ -273,14 +285,14 @@ const ENEMY_TYPES = {
     expValue: 25
   },
   tank: {
-    hp: 10,
+    hp: 12,
     speed: 0.6,
     r: 18,
     color: "darkred",
     expValue: 50
   },
   shooter: {
-    hp: 3,
+    hp: 4,
     speed: 0.8,
     r: 12,
     shootInterval: 1500,
@@ -299,6 +311,10 @@ const ENEMY_TYPES = {
 };
 
 const particles = [];
+
+// 특수 효과용 변수
+let edgeExplosionEffect = { active: false, timer: 0, duration: 1.0 };
+let edgeAuraEffect = { active: false, timer: 0, duration: 1.0 };
 
 // ================= ENEMY BULLETS =================
 const enemyBullets = [];
@@ -342,6 +358,10 @@ const ITEM_TYPES = {
     apply: () => {
       player.isItemInvincible = true;
       player.itemInvincibleTimer = 10;
+      
+      // 캔버스 가장자리 노란 오오라 특수효과
+      createEdgeAuraEffect();
+      
       console.log("10초 무적!");
     }
   },
@@ -350,6 +370,11 @@ const ITEM_TYPES = {
     r: 10,
     chance: 0.15,
     apply: () => {
+      playSound('bomb');
+      
+      // 캔버스 가장자리 폭발 특수효과
+      createEdgeExplosionEffect();
+      
       enemies.forEach(e => {
         if (e.type !== "boss") {
           spawnExp(e.x, e.y, e.expValue);
@@ -494,6 +519,35 @@ function spawnParticles(x, y, color, count = 8) {
       maxLife: 30,
       color
     });
+  }
+}
+
+// 폭탄 아이템 획득 시 캔버스 가장자리 폭발 효과
+function createEdgeExplosionEffect() {
+  edgeExplosionEffect.active = true;
+  edgeExplosionEffect.timer = 0;
+}
+
+// 무적 아이템 획득 시 캔버스 가장자리 노란 오오라 효과
+function createEdgeAuraEffect() {
+  edgeAuraEffect.active = true;
+  edgeAuraEffect.timer = 0;
+}
+
+// 특수 효과 업데이트
+function updateSpecialEffects() {
+  if (edgeExplosionEffect.active) {
+    edgeExplosionEffect.timer += deltaTime;
+    if (edgeExplosionEffect.timer >= edgeExplosionEffect.duration) {
+      edgeExplosionEffect.active = false;
+    }
+  }
+  
+  if (edgeAuraEffect.active) {
+    edgeAuraEffect.timer += deltaTime;
+    if (edgeAuraEffect.timer >= edgeAuraEffect.duration) {
+      edgeAuraEffect.active = false;
+    }
   }
 }
 
@@ -661,6 +715,45 @@ function drawWorldEdge() {
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  
+  // 폭탄 효과 - 가장자리 폭발
+  if (edgeExplosionEffect.active) {
+    const progress = edgeExplosionEffect.timer / edgeExplosionEffect.duration;
+    const alpha = 1 - progress;
+    const pulseSize = progress * 40;
+    
+    ctx.strokeStyle = `rgba(255, 100, 0, ${alpha * 0.8})`;
+    ctx.lineWidth = 20 - progress * 15;
+    ctx.shadowBlur = 30;
+    ctx.shadowColor = "orange";
+    
+    // 화면 가장자리에 사각형 테두리
+    ctx.strokeRect(
+      pulseSize, 
+      pulseSize, 
+      canvas.width - pulseSize * 2, 
+      canvas.height - pulseSize * 2
+    );
+    
+    ctx.shadowBlur = 0;
+  }
+  
+  // 무적 효과 - 가장자리 노란 오오라
+  if (edgeAuraEffect.active) {
+    const progress = edgeAuraEffect.timer / edgeAuraEffect.duration;
+    const alpha = 1 - progress;
+    const pulseIntensity = Math.sin(edgeAuraEffect.timer * 10) * 0.3 + 0.7;
+    
+    ctx.strokeStyle = `rgba(255, 255, 0, ${alpha * pulseIntensity})`;
+    ctx.lineWidth = 15;
+    ctx.shadowBlur = 40;
+    ctx.shadowColor = "yellow";
+    
+    // 화면 가장자리에 사각형 테두리
+    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+    
+    ctx.shadowBlur = 0;
   }
 }
 
@@ -1447,31 +1540,71 @@ function draw() {
     }
   });
 
-  // bullets
-  ctx.fillStyle = "yellow";
+  // bullets - 화살 이미지 사용
   bullets.forEach(b => {
-    ctx.beginPath();
-    ctx.arc(
-      b.x - camera.x,
-      b.y - camera.y,
-      BULLET_RADIUS,
-      0,
-      Math.PI * 2
-    );
-    ctx.fill();
+    if (arrowImage.complete) {
+      ctx.save();
+      
+      // 총알 이동 방향 계산 (angle)
+      const angle = Math.atan2(b.vy, b.vx);
+      
+      // 화살 크기 설정
+      const arrowWidth = 60;
+      const arrowHeight = 60;
+      
+      // 화살 위치로 이동 및 회전
+      ctx.translate(b.x - camera.x, b.y - camera.y);
+      ctx.rotate(angle);
+      
+      // 화살 이미지 그리기 (중앙 기준)
+      ctx.drawImage(
+        arrowImage,
+        -arrowWidth / 2,
+        -arrowHeight / 2,
+        arrowWidth,
+        arrowHeight
+      );
+      
+      ctx.restore();
+    } else {
+      // 이미지 로딩 전 폴백
+      ctx.fillStyle = "yellow";
+      ctx.beginPath();
+      ctx.arc(
+        b.x - camera.x,
+        b.y - camera.y,
+        BULLET_RADIUS,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
   });
 
-  // enemy bullets
-  ctx.fillStyle = "magenta";
+  // enemy bullets - 작은 화염구처럼 변경
   enemyBullets.forEach(b => {
-    ctx.beginPath();
-    ctx.arc(
-      b.x - camera.x,
-      b.y - camera.y,
-      ENEMY_BULLET_RADIUS,
-      0,
-      Math.PI * 2
+    const screenX = b.x - camera.x;
+    const screenY = b.y - camera.y;
+    
+    // 화염구 효과
+    const gradient = ctx.createRadialGradient(
+      screenX, screenY, 0,
+      screenX, screenY, ENEMY_BULLET_RADIUS * 1.5
     );
+    gradient.addColorStop(0, "#ffff00");
+    gradient.addColorStop(0.4, "#ff8800");
+    gradient.addColorStop(0.7, "#ff0000");
+    gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
+    
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(screenX, screenY, ENEMY_BULLET_RADIUS * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 중앙 밝은 부분
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(screenX, screenY, ENEMY_BULLET_RADIUS * 0.6, 0, Math.PI * 2);
     ctx.fill();
   });
 
@@ -1540,6 +1673,7 @@ function loop(currentTime) {
     shoot(time);
     updateBullets(time);
     updateParticles();
+    updateSpecialEffects();
     updateEnemyBullets(time);
     updateExps();
     updateItems();
