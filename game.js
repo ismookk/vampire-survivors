@@ -1277,7 +1277,7 @@ function gainExp(amount) {
   player.exp += amount;
   if (player.exp >= player.expToNext) {
     player.exp -= player.expToNext;
-    player.expToNext = Math.floor(player.expToNext * 1.2);
+    player.expToNext = Math.floor(player.expToNext * 1.25);
     player.level++;
     openLevelUp();
   }
