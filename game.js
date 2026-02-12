@@ -136,6 +136,45 @@ function playSound(type) {
   }
 }
 
+// ================= SFX (MP3 효과음) =================
+// 파일 경로: sounds/ 폴더 안에 mp3 파일을 넣어주세요.
+// 필요한 파일 목록:
+//   sounds/arrow.mp3        → 플레이어 화살 발사음
+//   sounds/chaser_death.mp3 → 고블린(chaser) 처치음
+//   sounds/dasher_death.mp3 → 박쥐(dasher) 처치음
+//   sounds/shooter_death.mp3→ 해골마법사(shooter) 처치음
+//   sounds/tank_death.mp3   → 골렘(tank) 처치음
+
+const sfxSounds = {
+  arrow:          new Audio('sounds/arrow.mp3'),
+  chaser_death:   new Audio('sounds/chaser_death.mp3'),
+  dasher_death:   new Audio('sounds/dasher_death.mp3'),
+  shooter_death:  new Audio('sounds/shooter_death.mp3'),
+  tank_death:     new Audio('sounds/tank_death.mp3'),
+};
+
+// 각 효과음 기본 볼륨 설정 (0.0 ~ 1.0)
+sfxSounds.arrow.volume          = 0.5;
+sfxSounds.chaser_death.volume   = 0.7;
+sfxSounds.dasher_death.volume   = 0.7;
+sfxSounds.shooter_death.volume  = 0.75;
+sfxSounds.tank_death.volume     = 0.8;  // 골렘은 조금 더 묵직하게
+
+/**
+ * MP3 효과음 재생 함수.
+ * cloneNode()로 복사해 동시 다중 재생을 지원합니다.
+ * @param {string} name  sfxSounds 의 키값 (예: 'arrow', 'chaser_death')
+ */
+function playSFX(name) {
+  if (isMuted) return;
+  const original = sfxSounds[name];
+  if (!original) return;
+
+  const clone = original.cloneNode();
+  clone.volume = original.volume;
+  clone.play().catch(() => {});   // 브라우저 자동재생 정책 예외 무시
+}
+
 // ================= MUTE BUTTON LOGIC =================
 
 
@@ -1069,6 +1108,9 @@ function shoot(time) {
       pierced: 0
     });
   }
+
+  // 화살 발사 효과음
+  playSFX('arrow');
 }
 
 function updateBullets(time) {
@@ -1092,6 +1134,17 @@ function updateBullets(time) {
         if (e.hp <= 0) {
           spawnExp(e.x, e.y, e.expValue);
           spawnParticles(e.x, e.y, e.color);
+
+          // 적 타입별 처치 효과음
+          // boss는 별도 처리 없이 tank_death 공유 (원하면 boss_death.mp3 추가 가능)
+          switch (e.type) {
+            case 'chaser':  playSFX('chaser_death');  break;  // 고블린
+            case 'dasher':  playSFX('dasher_death');  break;  // 박쥐
+            case 'shooter': playSFX('shooter_death'); break;  // 해골마법사
+            case 'tank':    playSFX('tank_death');    break;  // 골렘
+            case 'boss':    playSFX('tank_death');    break;  // 보스 – 골렘음 재활용
+          }
+
           enemies.splice(j, 1);
           enemiesKilled++;  // 처치 카운트 증가
         }
@@ -1224,7 +1277,7 @@ function gainExp(amount) {
   player.exp += amount;
   if (player.exp >= player.expToNext) {
     player.exp -= player.expToNext;
-    player.expToNext = Math.floor(player.expToNext * 1.3);
+    player.expToNext = Math.floor(player.expToNext * 1.2);
     player.level++;
     openLevelUp();
   }
